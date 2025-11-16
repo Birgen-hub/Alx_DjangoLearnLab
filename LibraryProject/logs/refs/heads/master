@@ -1,0 +1,2 @@
+0000000000000000000000000000000000000000 5f19060e1e9afa5da92a1558c01510d022e63865 Dolly Birgen <dollybirgen@gmail.com> 1763327784 +0300	commit (initial): Add CRUD scripts and markdown documentation
+5f19060e1e9afa5da92a1558c01510d022e63865 05c8d1983ddcd62ec6a0562dae48584299b9bac8 Dolly Birgen <dollybirgen@gmail.com> 1763327880 +0300	pull origin master --rebase (finish): refs/heads/master onto 373db32105f8b603ea99183f8f6e3bd5f6ee279b
