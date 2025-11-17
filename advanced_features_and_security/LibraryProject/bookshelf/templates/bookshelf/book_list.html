@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book List</title>
+</head>
+<body>
+    <h1>All Books</h1>
+    <form method="get">
+        <input type="text" name="q" placeholder="Search books...">
+        <input type="submit" value="Search">
+    </form>
+    
+    <ul>
+    {% for book in books %}
+        <li>{{ book.title }} by {{ book.author.name|default:"Unknown Author" }}</li>
+    {% empty %}
+        <li>No books found.</li>
+    {% endfor %}
+    </ul>
+
+    <p><a href="{% url 'form_example' %}">Go to Secure Form</a></p>
+</body>
+</html>
