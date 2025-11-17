@@ -21,7 +21,8 @@ def run_queries():
     book2 = Book.objects.create(title='Harry Potter 2', author=author1)
     book3 = Book.objects.create(title='1984', author=author2)
     
-    library = Library.objects.create(name='Central City Library')
+    library_name = 'Central City Library'
+    library = Library.objects.create(name=library_name)
     library.books.add(book1, book3)
     
     librarian = Librarian.objects.create(name='Jane Doe', library=library)
@@ -39,7 +40,7 @@ def run_queries():
     # --- 3. List all books in a library (ManyToManyField) ---
     print("
 --- Query 2: Books in Central City Library (ManyToManyField) ---")
-    library_obj = Library.objects.get(name='Central City Library')
+    library_obj = Library.objects.get(name=library_name)
     library_books = library_obj.books.all()
     for book in library_books:
         print(f"- {book.title} (by {book.author.name})")
@@ -47,7 +48,7 @@ def run_queries():
     # --- 4. Retrieve the librarian for a library (OneToOneField) ---
     print("
 --- Query 3: Librarian for Central City Library (OneToOneField) ---")
-    library_obj = Library.objects.get(name='Central City Library')
+    library_obj = Library.objects.get(name=library_name)
     try:
         lib_staff = library_obj.librarian
         print(f"- Librarian: {lib_staff.name}")
