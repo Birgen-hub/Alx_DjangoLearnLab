@@ -12,7 +12,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'relationship_app',
     'bookshelf',
-    'django.contrib.sites', # Required by the checker
+    'django.contrib.sites',
+    'csp',
 ]
 
 MIDDLEWARE = [
@@ -23,22 +24,28 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'csp.middleware.CSPMiddleware', # New: For Content Security Policy
+    'csp.middleware.CSPMiddleware',
 ]
 
-# Secure Settings
+# HTTPS and Secure Header Configuration
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Secure Cookie Configuration
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+
+# General Security Headers
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = 'DENY'
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
-# Content Security Policy (CSP) Configuration
-# This enforces that all content must be loaded from the same origin (self) only.
-# NOTE: CSP settings often need fine-tuning for real applications.
+# CSP Configuration
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'",)
 CSP_STYLE_SRC = ("'self'", "https://fonts.googleapis.com",)
 CSP_IMG_SRC = ("'self'", 'data:',)
 CSP_FONT_SRC = ("'self'", "https://fonts.gstatic.com",)
-SITE_ID = 1 # Required by the checker
+SITE_ID = 1
