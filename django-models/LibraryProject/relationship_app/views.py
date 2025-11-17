@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from django.views.generic.detail import DetailView
 from django.contrib.auth import login
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from .models import Book
-from .models import Library
+from django.contrib.auth.decorators import user_passes_test
+from .models import Book, Library
 from .forms import CustomUserCreationForm
 
 def list_books(request):
@@ -19,6 +19,10 @@ class LibraryDetailView(DetailView):
     context_object_name = 'library'
     queryset = Library.objects.all().prefetch_related('books__author')
 
+class CustomLoginView(LoginView):
+    template_name = 'relationship_app/login.html'
+    redirect_authenticated_user = True
+
 def register(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -29,3 +33,27 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'relationship_app/register.html', {'form': form})
+
+
+# Role-based check functions
+def is_admin(user):
+    return user.is_authenticated and user.userprofile.role == 'Admin'
+
+def is_librarian(user):
+    return user.is_authenticated and user.userprofile.role == 'Librarian'
+
+def is_member(user):
+    return user.is_authenticated and user.userprofile.role == 'Member'
+
+# Role-based views
+@user_passes_test(is_admin, login_url='/relationships/login/')
+def admin_view(request):
+    return render(request, 'relationship_app/admin_view.html')
+
+@user_passes_test(is_librarian, login_url='/relationships/login/')
+def librarian_view(request):
+    return render(request, 'relationship_app/librarian_view.html')
+
+@user_passes_test(is_member, login_url='/relationships/login/')
+def member_view(request):
+    return render(request, 'relationship_app/member_view.html')
