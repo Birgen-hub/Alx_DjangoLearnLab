@@ -1,4 +1,4 @@
 SECRET_KEY = 'dummy-key-for-checker'
 DEBUG = True
 
-AUTH_USER_MODEL = 'relationship_app.CustomUser'
+AUTH_USER_MODEL = 'bookshelf.CustomUser'
