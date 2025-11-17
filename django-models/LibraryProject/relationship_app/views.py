@@ -4,9 +4,10 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test, permission_required
 from .models import Book, Library
 from .forms import CustomUserCreationForm
+
 
 def list_books(request):
     books = Book.objects.all().select_related('author')
@@ -18,10 +19,6 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
     queryset = Library.objects.all().prefetch_related('books__author')
-
-class CustomLoginView(LoginView):
-    template_name = 'relationship_app/login.html'
-    redirect_authenticated_user = True
 
 def register(request):
     if request.method == 'POST':
@@ -35,7 +32,6 @@ def register(request):
     return render(request, 'relationship_app/register.html', {'form': form})
 
 
-# Role-based check functions
 def is_admin(user):
     return user.is_authenticated and user.userprofile.role == 'Admin'
 
@@ -45,7 +41,6 @@ def is_librarian(user):
 def is_member(user):
     return user.is_authenticated and user.userprofile.role == 'Member'
 
-# Role-based views
 @user_passes_test(is_admin, login_url='/relationships/login/')
 def admin_view(request):
     return render(request, 'relationship_app/admin_view.html')
@@ -57,3 +52,16 @@ def librarian_view(request):
 @user_passes_test(is_member, login_url='/relationships/login/')
 def member_view(request):
     return render(request, 'relationship_app/member_view.html')
+
+
+@permission_required('relationship_app.can_add_book', login_url='/relationships/login/')
+def add_book(request):
+    return render(request, 'relationship_app/book_action.html', {'action': 'Add Book', 'permission': 'can_add_book'})
+
+@permission_required('relationship_app.can_change_book', login_url='/relationships/login/')
+def edit_book(request, pk):
+    return render(request, 'relationship_app/book_action.html', {'action': f'Edit Book ID: {pk}', 'permission': 'can_change_book'})
+
+@permission_required('relationship_app.can_delete_book', login_url='/relationships/login/')
+def delete_book(request, pk):
+    return render(request, 'relationship_app/book_action.html', {'action': f'Delete Book ID: {pk}', 'permission': 'can_delete_book'})

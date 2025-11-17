@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ action }}</title>
+</head>
+<body>
+    <h1>{{ action }} Successful (Permissions Check Passed)</h1>
+    <p>This page confirms you have the permission: <strong>{{ permission }}</strong></p>
+    <p>In a real application, the form for the operation would be here.</p>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>
