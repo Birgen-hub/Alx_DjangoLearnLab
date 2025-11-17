@@ -47,7 +47,8 @@ def run_queries():
 --- Query 3: Librarian for Central City Library (OneToOneField) ---")
     library_obj = Library.objects.get(name=library_name)
     try:
-        lib_staff = library_obj.librarian
+        # Required query: retrieving Librarian by library object
+        lib_staff = Librarian.objects.get(library=library_obj)
         print(f"- Librarian: {lib_staff.name}")
     except Librarian.DoesNotExist:
         print("- No librarian found.")
