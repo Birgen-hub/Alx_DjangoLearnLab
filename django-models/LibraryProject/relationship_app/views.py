@@ -4,7 +4,8 @@ from django.contrib.auth import login
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_passes_test, permission_required
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import permission_required
 from .models import Book, Library
 from .forms import CustomUserCreationForm
 
@@ -19,6 +20,10 @@ class LibraryDetailView(DetailView):
     template_name = 'relationship_app/library_detail.html'
     context_object_name = 'library'
     queryset = Library.objects.all().prefetch_related('books__author')
+
+class CustomLoginView(LoginView):
+    template_name = 'relationship_app/login.html'
+    redirect_authenticated_user = True
 
 def register(request):
     if request.method == 'POST':
