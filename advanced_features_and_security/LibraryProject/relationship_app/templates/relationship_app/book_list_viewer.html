@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Secure Book List</title>
+</head>
+<body>
+    <h1>Secured Book List (can_view_book required)</h1>
+    <p>If you see this page, you have the necessary viewing permission.</p>
+    <ul>
+    {% for book in books %}
+        <li>{{ book.title }} by {{ book.author.name }}</li>
+    {% endfor %}
+    </ul>
+    <p><a href="{% url 'book_create' %}">Create Book (Requires can_create_book)</a></p>
+    <p><a href="{% url 'logout' %}">Logout</a></p>
+</body>
+</html>

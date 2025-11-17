@@ -14,7 +14,8 @@ urlpatterns = [
     path('librarian-tools/', views.librarian_view, name='librarian_view'),
     path('member-area/', views.member_view, name='member_view'),
 
-    path('add_book/', views.add_book, name='add_book'),
-    path('edit_book/<int:pk>/', views.edit_book, name='edit_book'),
-    path('delete_book/<int:pk>/', views.delete_book, name='delete_book'),
+    path('books/secure/list/', views.book_list_viewer, name='book_list_viewer'),
+    path('books/secure/create/', views.book_create, name='book_create'),
+    path('books/secure/<int:pk>/edit/', views.book_edit, name='book_edit'),
+    path('books/secure/<int:pk>/delete/', views.book_delete, name='book_delete'),
 ]
