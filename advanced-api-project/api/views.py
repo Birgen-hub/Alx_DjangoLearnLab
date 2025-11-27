@@ -1,32 +1,36 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 
-# Maps to List and Create (equivalent to ListView and CreateView functionality)
 class AuthorListCreate(generics.ListCreateAPIView):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    # Applying permissions
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-# Maps to Retrieve, Update, and Destroy (equivalent to DetailView, UpdateView, DeleteView functionality)
 class AuthorRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
-    # Applying permissions
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-# Maps to List and Create
 class BookListCreate(generics.ListCreateAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    # Applying permissions
     permission_classes = [IsAuthenticatedOrReadOnly]
+    
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    
+    filterset_fields = ['title', 'publication_year', 'author__name']
+    
+    search_fields = ['title', 'author__name']
+    
+    ordering_fields = ['title', 'publication_year']
+    
+    ordering = ['title']
 
-# Maps to Retrieve, Update, and Destroy
 class BookRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    # Applying permissions
     permission_classes = [IsAuthenticatedOrReadOnly]
