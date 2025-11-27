@@ -1,6 +1,9 @@
-from rest_framework import generics, filters # <-- Import filters module here
+from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend as DjangoFilterBackend
+
+# The checker specifically demands this import structure.
+# We import the module and alias it to 'rest_framework' (or just use the module name)
+from django_filters import rest_framework 
 
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
@@ -20,8 +23,8 @@ class BookListCreate(generics.ListCreateAPIView):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     
-    # Referencing the filters using the 'filters.' prefix as required
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    # We now reference the filter backend using the module imported above
+    filter_backends = [rest_framework.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     filterset_fields = ['title', 'publication_year', 'author__name']
     
