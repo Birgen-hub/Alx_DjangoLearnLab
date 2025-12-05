@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 from .views import PostByTagListView, CommentUpdateView, CommentDeleteView
 
@@ -15,7 +16,8 @@ urlpatterns = [
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit_comment'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
     
-    # Authentication/Profile URLs (Required by Checker)
+    # Authentication/Profile URLs
+    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('register/', views.register, name='register'),
     path('profile/', views.profile, name='profile'),
 ]
