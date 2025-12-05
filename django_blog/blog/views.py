@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib import messages
-from django.urls import reverse_lazy
-from .forms import UserRegisterForm, ProfileUpdateForm, PostForm
-from .models import Post
+from django.urls import reverse_lazy, reverse
+from .forms import UserRegisterForm, ProfileUpdateForm, PostForm, CommentForm
+from .models import Post, Comment
+
+# --- Authentication Views ---
 
 def register(request):
     if request.method == 'POST':
@@ -32,6 +34,9 @@ def profile(request):
         form = ProfileUpdateForm(instance=request.user)
     return render(request, 'blog/profile.html', {'form': form})
 
+
+# --- Post CRUD Views ---
+
 class PostListView(ListView):
     model = Post
     template_name = 'blog/post_list.html'
@@ -43,7 +48,40 @@ class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/post_detail.html'
     context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # 1. Add comment form for submission
+        context['comment_form'] = CommentForm()
+        # 2. Fetch all comments for the post
+        context['comments'] = self.object.comments.all()
+        return context
+
+    # Override POST method to handle comment form submission
+    def post(self, request, *args, **kwargs):
+        # Prevent non-authenticated users from submitting the form
+        if not request.user.is_authenticated:
+            messages.error(request, "You must be logged in to comment.")
+            return redirect('login')
+        
+        self.object = self.get_object() # Get the current Post object
+        form = CommentForm(request.POST)
+
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = self.object # Link comment to the current post
+            comment.author = request.user # Link comment to the current user
+            comment.save()
+            messages.success(request, 'Your comment has been posted.')
+            # Redirect back to the post detail page
+            return redirect(self.object.get_absolute_url())
+        
+        # If form is invalid, re-render the page with the error and existing comments
+        context = self.get_context_data(object=self.object)
+        context['comment_form'] = form # Use the invalid form to show errors
+        return self.render_to_response(context)
 post_detail = PostDetailView.as_view()
+
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
@@ -55,6 +93,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'Your post has been created!')
         return super().form_valid(form)
 post_create = PostCreateView.as_view()
+
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -70,6 +109,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return self.request.user == post.author
 post_update = PostUpdateView.as_view()
 
+
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = 'blog/post_confirm_delete.html'
@@ -83,3 +123,37 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         messages.success(self.request, 'Your post has been deleted.')
         return super().form_valid(form)
 post_delete = PostDeleteView.as_view()
+
+
+# --- Comment CRUD Views ---
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+    
+    # After successful update, redirect back to the post detail page
+    def get_success_url(self):
+        messages.success(self.request, 'Your comment has been updated.')
+        return reverse('post_detail', kwargs={'pk': self.object.post.pk})
+
+    # Only allow the comment author to edit the comment
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+comment_update = CommentUpdateView.as_view()
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+    
+    # After successful deletion, redirect back to the post detail page
+    def get_success_url(self):
+        messages.success(self.request, 'Your comment has been deleted.')
+        return reverse('post_detail', kwargs={'pk': self.object.post.pk})
+
+    # Only allow the comment author to delete the comment
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+comment_delete = CommentDeleteView.as_view()

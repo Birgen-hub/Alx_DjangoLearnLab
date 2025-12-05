@@ -12,6 +12,10 @@ header {
     text-align: center;
 }
 
+header nav {
+    margin-left: 10%;
+}
+
 header a {
     color: #fff;
     text-decoration: none;
@@ -25,6 +29,7 @@ header a {
     padding: 20px 0;
 }
 
+/* Post Styling */
 .post {
     background: #fff;
     padding: 15px;
@@ -49,6 +54,7 @@ header a {
     display: block;
 }
 
+/* Form Styling */
 form {
     background: #fff;
     padding: 20px;
@@ -58,7 +64,8 @@ form {
     margin: 20px auto;
 }
 
-button, .btn-create, .btn-edit, .btn-delete, .btn-cancel {
+/* Button Styling (General) */
+button, .btn-create, .btn-edit, .btn-delete, .btn-cancel, .btn-comment {
     display: inline-block;
     padding: 10px 15px;
     border: none;
@@ -71,6 +78,7 @@ button, .btn-create, .btn-edit, .btn-delete, .btn-cancel {
     transition: background-color 0.3s;
 }
 
+/* Primary Form Button */
 form button {
     background: #5cb85c;
     color: white;
@@ -79,10 +87,21 @@ form button:hover {
     background: #4cae4c;
 }
 
+.btn-comment {
+    background: #3498db;
+    color: white;
+}
+.btn-comment:hover {
+    background: #2980b9;
+}
+
+
+/* Post Controls Layout */
 .post-controls {
     margin-top: 10px;
 }
 
+/* Create Button */
 .btn-create {
     background: #007bff;
     color: white;
@@ -91,6 +110,7 @@ form button:hover {
     background: #0056b3;
 }
 
+/* Edit Button */
 .btn-edit {
     background: #ffc107;
     color: #333;
@@ -100,6 +120,7 @@ form button:hover {
     background: #e0a800;
 }
 
+/* Delete Button */
 .btn-delete {
     background: #dc3545;
     color: white;
@@ -108,6 +129,7 @@ form button:hover {
     background: #c82333;
 }
 
+/* Cancel Button */
 .btn-cancel {
     background: #6c757d;
     color: white;
@@ -117,6 +139,7 @@ form button:hover {
     background: #5a6268;
 }
 
+/* Header Controls for List View */
 .header-controls {
     display: flex;
     justify-content: space-between;
@@ -128,6 +151,7 @@ form button:hover {
     margin: 0;
 }
 
+/* Messages */
 .alert {
     padding: 10px;
     margin-bottom: 15px;
@@ -137,3 +161,66 @@ form button:hover {
 .alert.success { background-color: #5cb85c; }
 .alert.error { background-color: #d9534f; }
 .alert.info { background-color: #5bc0de; }
+
+
+/* --- Comment Section Styling --- */
+.comments-section {
+    background: #fff;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.comment-list {
+    margin-top: 15px;
+}
+
+.comment-item {
+    border-left: 4px solid #3498db;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    border-radius: 0 5px 5px 0;
+}
+
+.comment-meta {
+    font-size: 0.85em;
+    color: #777;
+    margin-bottom: 5px;
+}
+
+.comment-content {
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.comment-controls a {
+    font-size: 0.8em;
+    margin-right: 10px;
+    text-decoration: underline;
+    color: #3498db;
+}
+
+.btn-edit-comment {
+    color: #ffc107 !important;
+}
+.btn-delete-comment {
+    color: #dc3545 !important;
+}
+
+.add-comment form {
+    max-width: 100%;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+}
+
+.comment-to-delete {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}

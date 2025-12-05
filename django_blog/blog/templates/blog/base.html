@@ -17,6 +17,10 @@
                 <a href="{% url 'register' %}">Register</a>
             {% endif %}
         </nav>
+        <form action="{% url 'search' %}" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Search posts and tags..." required>
+            <button type="submit">Search</button>
+        </form>
     </header>
     <div class="content">
         {% if messages %}
