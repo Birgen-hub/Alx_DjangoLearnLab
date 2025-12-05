@@ -16,7 +16,9 @@ urlpatterns = [
     path('post/<int:pk>/update/', views.post_update, name='post_update'),
     path('post/<int:pk>/delete/', views.post_delete, name='post_delete'),
 
-    # Comment CRUD URLs (uses Comment PK)
+    # Comment CRUD URLs
+    # Creation now requires the post's primary key (post_pk)
+    path('post/<int:post_pk>/comment/new/', views.comment_create, name='comment_create'),
     path('comment/<int:pk>/update/', views.comment_update, name='comment_update'),
     path('comment/<int:pk>/delete/', views.comment_delete, name='comment_delete'),
 ]

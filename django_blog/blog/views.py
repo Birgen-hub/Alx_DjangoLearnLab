@@ -51,35 +51,13 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # 1. Add comment form for submission
+        # 1. Add comment form for display (submission goes to CommentCreateView)
         context['comment_form'] = CommentForm()
         # 2. Fetch all comments for the post
         context['comments'] = self.object.comments.all()
         return context
 
-    # Override POST method to handle comment form submission
-    def post(self, request, *args, **kwargs):
-        # Prevent non-authenticated users from submitting the form
-        if not request.user.is_authenticated:
-            messages.error(request, "You must be logged in to comment.")
-            return redirect('login')
-        
-        self.object = self.get_object() # Get the current Post object
-        form = CommentForm(request.POST)
-
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = self.object # Link comment to the current post
-            comment.author = request.user # Link comment to the current user
-            comment.save()
-            messages.success(request, 'Your comment has been posted.')
-            # Redirect back to the post detail page
-            return redirect(self.object.get_absolute_url())
-        
-        # If form is invalid, re-render the page with the error and existing comments
-        context = self.get_context_data(object=self.object)
-        context['comment_form'] = form # Use the invalid form to show errors
-        return self.render_to_response(context)
+# The .post() method for handling comment submission is removed and moved to CommentCreateView
 post_detail = PostDetailView.as_view()
 
 
@@ -127,17 +105,39 @@ post_delete = PostDeleteView.as_view()
 
 # --- Comment CRUD Views ---
 
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    # Note: This view does not render its own template; it is called by POST from post_detail.html
+
+    def form_valid(self, form):
+        # Get the Post object using the 'post_pk' passed in the URL
+        post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = self.request.user
+        comment.save()
+        
+        messages.success(self.request, 'Your comment has been posted.')
+        return super().form_valid(form)
+
+    # After successful creation, redirect back to the post detail page
+    def get_success_url(self):
+        # Use the post_pk from the URL kwargs to redirect
+        return reverse('post_detail', kwargs={'pk': self.kwargs['post_pk']})
+comment_create = CommentCreateView.as_view()
+
+
 class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Comment
     form_class = CommentForm
     template_name = 'blog/comment_form.html'
     
-    # After successful update, redirect back to the post detail page
     def get_success_url(self):
         messages.success(self.request, 'Your comment has been updated.')
         return reverse('post_detail', kwargs={'pk': self.object.post.pk})
 
-    # Only allow the comment author to edit the comment
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
@@ -147,12 +147,10 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
     template_name = 'blog/comment_confirm_delete.html'
     
-    # After successful deletion, redirect back to the post detail page
     def get_success_url(self):
         messages.success(self.request, 'Your comment has been deleted.')
         return reverse('post_detail', kwargs={'pk': self.object.post.pk})
 
-    # Only allow the comment author to delete the comment
     def test_func(self):
         comment = self.get_object()
         return self.request.user == comment.author
