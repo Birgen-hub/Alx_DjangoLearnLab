@@ -25,7 +25,6 @@ header a {
     padding: 20px 0;
 }
 
-/* Post Styling */
 .post {
     background: #fff;
     padding: 15px;
@@ -50,7 +49,6 @@ header a {
     display: block;
 }
 
-/* Form and Auth Styling */
 form {
     background: #fff;
     padding: 20px;
@@ -60,7 +58,6 @@ form {
     margin: 20px auto;
 }
 
-/* Button Styling (General) */
 button, .btn-create, .btn-edit, .btn-delete, .btn-cancel {
     display: inline-block;
     padding: 10px 15px;
@@ -74,7 +71,6 @@ button, .btn-create, .btn-edit, .btn-delete, .btn-cancel {
     transition: background-color 0.3s;
 }
 
-/* Primary Form Button */
 form button {
     background: #5cb85c;
     color: white;
@@ -83,12 +79,10 @@ form button:hover {
     background: #4cae4c;
 }
 
-/* Post Controls Layout */
 .post-controls {
     margin-top: 10px;
 }
 
-/* Create Button */
 .btn-create {
     background: #007bff;
     color: white;
@@ -97,7 +91,6 @@ form button:hover {
     background: #0056b3;
 }
 
-/* Edit Button */
 .btn-edit {
     background: #ffc107;
     color: #333;
@@ -107,7 +100,6 @@ form button:hover {
     background: #e0a800;
 }
 
-/* Delete Button */
 .btn-delete {
     background: #dc3545;
     color: white;
@@ -116,7 +108,6 @@ form button:hover {
     background: #c82333;
 }
 
-/* Cancel Button */
 .btn-cancel {
     background: #6c757d;
     color: white;
@@ -126,7 +117,6 @@ form button:hover {
     background: #5a6268;
 }
 
-/* Header Controls for List View */
 .header-controls {
     display: flex;
     justify-content: space-between;
@@ -138,7 +128,6 @@ form button:hover {
     margin: 0;
 }
 
-/* Messages */
 .alert {
     padding: 10px;
     margin-bottom: 15px;
