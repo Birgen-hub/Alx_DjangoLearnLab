@@ -1,8 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
-from django.views.generic import ListView
-from .models import Post
-from .forms import PostForm
+from django.views.generic import ListView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from .models import Post, Comment
+from .forms import PostForm, CommentForm
 
 # Class-based view for filtering posts by tag
 class PostByTagListView(ListView):
@@ -19,7 +22,45 @@ class PostByTagListView(ListView):
         context['tag_name'] = tag_slug.replace('-', ' ').title()
         return context
 
-# Placeholder function views (kept for existing URLs)
+# Comment Views (CRUD)
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/post_detail.html'
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs.get('pk'))
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return self.object.post.get_absolute_url()
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = 'blog/comment_form.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'blog/comment_confirm_delete.html'
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy('post_detail', kwargs={'pk': self.object.post.pk})
+
+# Placeholder function views (updated post_detail)
 def post_list(request):
     posts = Post.objects.all().order_by('-id')
     return render(request, 'blog/post_list.html', {'posts': posts})
@@ -32,7 +73,22 @@ def post_edit(request, pk):
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
-    return render(request, 'blog/post_detail.html', {'post': post})
+    comment_form = CommentForm()
+    
+    # Simple form submission for demonstration. For production, the CBV is preferred.
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.post = post
+            new_comment.author = request.user
+            new_comment.save()
+            return redirect('post_detail', pk=post.pk)
+
+    return render(request, 'blog/post_detail.html', {
+        'post': post,
+        'comment_form': comment_form
+    })
 
 # Search Functionality
 def post_search(request):
