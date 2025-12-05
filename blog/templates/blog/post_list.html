@@ -1,0 +1,27 @@
+<h1>{{ title }}</h1>
+
+<form action="{% url 'blog:post_search' %}" method="get">
+    <input type="text" name="q" placeholder="Search posts, tags..." required>
+    <button type="submit">Search</button>
+</form>
+
+{% if is_tag_view %}
+    <p>Showing posts for tag: <strong>{{ tag_name }}</strong></p>
+{% endif %}
+
+{% for post in posts %}
+    <hr>
+    <h2><a href="{% url 'blog:post_detail' post.pk %}">{{ post.title }}</a></h2>
+    <p>{{ post.content|truncatechars:150 }}</p>
+    
+    {% if post.tags.all %}
+    <p>
+        <strong>Tags:</strong>
+        {% for tag in post.tags.all %}
+            <a href="{% url 'blog:posts_by_tag' tag.slug %}" style="margin-right: 5px; background-color: #eee; padding: 3px 6px; border-radius: 3px; text-decoration: none;">#{{ tag.name }}</a>
+        {% endfor %}
+    </p>
+    {% endif %}
+{% empty %}
+    <p>No posts found.</p>
+{% endfor %}

@@ -1,6 +1,7 @@
 from django import forms
 from .models import Post
 
+# Required custom widget definition
 class TagWidget(forms.Textarea):
     pass
 
