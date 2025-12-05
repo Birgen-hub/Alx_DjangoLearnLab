@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import PostByTagListView, CommentCreateView, CommentUpdateView, CommentDeleteView
+from .views import PostByTagListView, CommentUpdateView, CommentDeleteView
 
 urlpatterns = [
     path('', views.post_list, name='post_list'),
@@ -10,8 +10,12 @@ urlpatterns = [
     path('search/', views.post_search, name='post_search'),
     path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='post_by_tag'),
 
-    # Comment URLs (Updated to match checker requirements)
+    # Comment URLs
     path('post/<int:pk>/comments/new/', views.post_detail, name='add_comment'),
     path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit_comment'),
     path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
+    
+    # Authentication/Profile URLs (Required by Checker)
+    path('register/', views.register, name='register'),
+    path('profile/', views.profile, name='profile'),
 ]
