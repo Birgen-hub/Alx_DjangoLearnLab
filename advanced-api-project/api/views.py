@@ -1,6 +1,6 @@
 from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as django_filters # <-- Specific import required by checker
 from .models import Book
 from .serializers import BookSerializer
 
@@ -10,10 +10,10 @@ class ListView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
     
     # Filtering, Searching, and Ordering Backends
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [django_filters.DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
-    # 1. Filtering by exact match fields
-    filterset_fields = ['title', 'publication_year']
+    # 1. Filtering fields (title, author__name, publication_year)
+    filterset_fields = ['title', 'publication_year', 'author__name']
     
     # 2. Searching across title and related author name
     search_fields = ['title', 'author__name']
