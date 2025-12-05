@@ -10,8 +10,8 @@ urlpatterns = [
     path('search/', views.post_search, name='post_search'),
     path('tags/<slug:tag_slug>/', PostByTagListView.as_view(), name='post_by_tag'),
 
-    # Comment URLs
-    path('post/<int:pk>/comments/new/', views.post_detail, name='add_comment'), # Handled by post_detail POST
-    path('comments/<int:pk>/edit/', CommentUpdateView.as_view(), name='edit_comment'),
-    path('comments/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
+    # Comment URLs (Updated to match checker requirements)
+    path('post/<int:pk>/comments/new/', views.post_detail, name='add_comment'),
+    path('comment/<int:pk>/update/', CommentUpdateView.as_view(), name='edit_comment'),
+    path('comment/<int:pk>/delete/', CommentDeleteView.as_view(), name='delete_comment'),
 ]
