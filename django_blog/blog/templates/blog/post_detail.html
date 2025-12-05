@@ -24,8 +24,8 @@
         {% if user.is_authenticated %}
             <div class="add-comment">
                 <h4>Leave a Comment</h4>
-                <!-- UPDATED: Form now posts to the dedicated CommentCreateView -->
-                <form method="POST" action="{% url 'comment_create' post_pk=post.pk %}">
+                <!-- UPDATED: Form action now points to the new URL structure with 'pk' -->
+                <form method="POST" action="{% url 'comment_create' pk=post.pk %}">
                     {% csrf_token %}
                     {{ comment_form|crispy }}
                     <button type="submit" class="btn-comment">Post Comment</button>

@@ -111,8 +111,8 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     # Note: This view does not render its own template; it is called by POST from post_detail.html
 
     def form_valid(self, form):
-        # Get the Post object using the 'post_pk' passed in the URL
-        post = get_object_or_404(Post, pk=self.kwargs['post_pk'])
+        # Retrieve Post using 'pk' (consistent with the updated URL)
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         
         comment = form.save(commit=False)
         comment.post = post
@@ -124,8 +124,8 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
 
     # After successful creation, redirect back to the post detail page
     def get_success_url(self):
-        # Use the post_pk from the URL kwargs to redirect
-        return reverse('post_detail', kwargs={'pk': self.kwargs['post_pk']})
+        # Use the 'pk' from the URL kwargs to redirect
+        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
 comment_create = CommentCreateView.as_view()
 
 
