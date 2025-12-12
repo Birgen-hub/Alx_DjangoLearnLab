@@ -1,14 +1,33 @@
-# Social Media API (social_media_api)
-This project provides a foundational Social Media API built with Django REST Framework.
-## Setup and Launch
-1. Ensure dependencies are installed: `pip install django djangorestframework`
-2. Run the server: `python manage.py runserver`
+# Social Media API - User Authentication
+
+This project sets up the foundational user authentication system for a Social Media API using Django and Django REST Framework.
+
+## Requirements
+
+* Python 3.8+
+* `pip install django djangorestframework`
+
+## Setup & First Launch
+
+1.  **Project Structure:** Ensure your file structure matches the project paths (e.g., `social_media_api/accounts/models.py`).
+
+2.  **Database Migration:** Run the initial migrations to create the custom User model and the auth tables. (You must be in the directory containing `manage.py` for this to work.)
+    ```bash
+    python manage.py makemigrations accounts
+    python manage.py migrate
+    ```
+
+3.  **Run Server:**
+    ```bash
+    python manage.py runserver
+    ```
+
 ## API Endpoints
-| Endpoint | Method | Authentication | Description |
+
+All endpoints are prefixed with `/api/auth/`. The base URL is `http://127.0.0.1:8000/api/auth/`.
+
+| Route | Method | Description | Authentication |
 | :--- | :--- | :--- | :--- |
-| `/api/v1/register` | POST | None | Create a new user account. |
-| `/api/v1/login` | POST | None | Log in and receive an authentication token. |
-| `/api/v1/profile` | GET/PUT | Token | Retrieve or update the authenticated user's profile. |
-## Authentication
-For protected endpoints (like `/profile`), include the token obtained during login in the request header:
-`Authorization: Token <YOUR_TOKEN>`
+| `/register` | **POST** | Creates a new user account (returns token). | None |
+| `/login` | **POST** | Authenticates a user and returns a token. | None |
+| `/profile` | **GET/PATCH** | Manages the logged-in user's profile. | Token Auth |
