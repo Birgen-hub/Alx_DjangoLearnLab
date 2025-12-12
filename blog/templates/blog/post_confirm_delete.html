@@ -1,0 +1,4 @@
+<style>body{font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px}h1{color:#dc3545;border-bottom:2px solid #eee;padding-bottom:10px}p{margin-bottom:20px}.button-delete{background-color:#dc3545;color:white;padding:10px 15px;border:none;border-radius:5px;cursor:pointer;margin-right:10px}.button-cancel{background-color:#6c757d;color:white;padding:10px 15px;border:none;border-radius:5px;text-decoration:none}.button-delete:hover{background-color:#c82333}</style>
+<h1>Delete Post</h1>
+<p>Are you sure you want to delete the post: "<strong>{{ post.title }}</strong>"?</p>
+<form method="post">{% csrf_token %}<button type="submit" class="button-delete">Confirm Delete</button><a href="{% url 'post_detail' post.pk %}" class="button-cancel">Cancel</a></form>

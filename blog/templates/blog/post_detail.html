@@ -1,0 +1,6 @@
+<style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px}h1{color:#333;border-bottom:2px solid #eee;padding-bottom:10px}.post-meta{font-size:.9em;color:#666;margin-bottom:20px}.post-content{line-height:1.6}.actions{margin-top:20px}.actions a{margin-right:10px;text-decoration:none;padding:8px 12px;border-radius:5px}.edit-link{background-color:#ffc107;color:#333}.delete-link{background-color:#dc3545;color:white}.back-link{background-color:#6c757d;color:white}</style>
+<h1>{{ post.title }}</h1>
+<div class="post-meta">By: {{ post.author.username }} | Published: {{ post.created_at|date:"M d, Y" }}</div>
+<div class="post-content">{{ post.content|linebreaks }}</div>
+{% if user.is_authenticated and user.id == post.author.id %}<div class="actions"><a href="{% url 'post_edit' post.pk %}" class="edit-link">Edit Post</a><a href="{% url 'post_delete' post.pk %}" class="delete-link">Delete Post</a></div>{% endif %}
+<p><a href="{% url 'post_list' %}" class="back-link">Back to Posts</a></p>
