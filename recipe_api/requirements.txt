@@ -1,9 +1,0 @@
-Django
-djangorestframework
-django-rest-knox
-dj-database-url
-psycopg2-binary
-whitenoise
-gunicorn
-Pillow
-django-filter
