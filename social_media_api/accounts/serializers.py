@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 
@@ -12,12 +13,15 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'email', 'password', 'bio')
 
     def create(self, validated_data):
-        user = User.objects.create_user(
+        # Create the user
+        user = get_user_model().objects.create_user(
             username=validated_data['username'],
-            email=validated_data.get('email'),
+            email=validated_data.get('email', ''),
             password=validated_data['password'],
             bio=validated_data.get('bio', '')
         )
+        # Create the auth token
+        Token.objects.create(user=user)
         return user
 
 class UserSerializer(serializers.ModelSerializer):
@@ -26,4 +30,3 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'bio', 'followers_count')
-
