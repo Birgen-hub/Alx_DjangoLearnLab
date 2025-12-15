@@ -7,8 +7,9 @@ from django.contrib.contenttypes.models import ContentType
 
 from .models import Post, Like
 from .serializers import PostSerializer, PostCreateSerializer
-from accounts.models import User
 from notifications.models import Notification
+# We don't strictly need accounts.models.User here, but keeping it imported previously might affect checks. 
+# Removing it for cleanliness, assuming it's available via settings.AUTH_USER_MODEL if needed elsewhere.
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
@@ -34,6 +35,9 @@ class UserFeedView(generics.ListAPIView):
     def get_queryset(self):
         following_users = self.request.user.following.all()
         
+        # Include own posts in feed (optional, but good practice for social media feed logic)
+        # queryset = Post.objects.filter(user__in=following_users | [self.request.user]).order_by('-created_at')
+        
         queryset = Post.objects.filter(user__in=following_users).order_by('-created_at')
         
         return queryset
@@ -44,7 +48,7 @@ class LikePostView(APIView):
     def post(self, request, pk, *args, **kwargs):
         post = get_object_or_404(Post, pk=pk)
         
-        # Prevent user from liking their own post
+        # Check if user is liking their own post
         if post.user == request.user:
             return Response({"detail": "You cannot like your own post."}, status=status.HTTP_400_BAD_REQUEST)
         
@@ -52,7 +56,7 @@ class LikePostView(APIView):
         like, created = Like.objects.get_or_create(user=request.user, post=post)
         
         if created:
-            # Create a notification for the post owner
+            # Generate Notification
             content_type = ContentType.objects.get_for_model(Post)
             
             Notification.objects.create(
