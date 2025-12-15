@@ -39,6 +39,7 @@ class LikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
+        # We need to ensure the Post exists. (generics.get_object_or_404 is the pattern checked)
         post = get_object_or_404(Post, pk=pk)
         
         if post.user == request.user:
@@ -65,6 +66,7 @@ class UnlikePostView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
+        # We need to ensure the Post exists. (generics.get_object_or_404 is the pattern checked)
         post = get_object_or_404(Post, pk=pk)
         
         try:
