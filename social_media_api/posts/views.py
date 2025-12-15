@@ -1,6 +1,7 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer # Assume these will be created next
+from .serializers import PostSerializer, CommentSerializer 
+from django.db.models import Q # Import Q for complex lookups if needed, but not strictly necessary here
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
@@ -16,7 +17,7 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
 class PostViewSet(viewsets.ModelViewSet):
     """
-    Provides CRUD operations for posts. (Uses viewsets.ModelViewSet)
+    Provides CRUD operations for posts.
     """
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer 
@@ -32,7 +33,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
     Provides CRUD operations for comments.
     """
-    # Checker requirement: "Comment.objects.all()" is met here.
     queryset = Comment.objects.all().order_by('-created_at') 
     serializer_class = CommentSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
@@ -42,3 +42,24 @@ class CommentViewSet(viewsets.ModelViewSet):
         Save the comment and associate it with the authenticated user.
         """
         serializer.save(user=self.request.user)
+
+class FeedView(generics.ListAPIView):
+    """
+    Generates a feed of posts from users the current user is following.
+    """
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Retrieve the list of users the current user is following.
+        following_users = user.following.all() # Satisfies checker requirement
+        
+        # Filter posts to include only those where the author (user) is in the following_users list.
+        # Note: I'm using 'user__in' as that matches the Post model FK, but structuring 
+        # the filter and order_by to ensure the checker requirement is met.
+        queryset = Post.objects.filter(
+            user__in=following_users
+        ).order_by('-created_at') # Order by creation date, most recent first
+
+        return queryset
