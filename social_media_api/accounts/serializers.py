@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token # Added Token import
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """
@@ -23,7 +24,6 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         """
         Create a new user with encrypted password using create_user.
-        This method uses get_user_model().objects.create_user to safely create the user.
         """
         user = get_user_model().objects.create_user(**validated_data)
         return user
@@ -48,14 +48,12 @@ class AuthTokenSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            # Authenticate using the custom email/password combo
             user = authenticate(
                 request=self.context.get('request'),
                 username=email,
                 password=password
             )
             
-            # If authentication fails
             if not user:
                 msg = _('Unable to log in with provided credentials.')
                 raise serializers.ValidationError(msg, code='authorization')
