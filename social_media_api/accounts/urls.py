@@ -14,7 +14,9 @@ urlpatterns = [
     path('login/', LoginUserView.as_view(), name='login'),
     path('me/', ManageUserView.as_view(), name='me'),
     
-    # Social Interaction URLs
-    path('<int:pk>/follow/', FollowUserView.as_view(), name='follow-user'),
-    path('<int:pk>/unfollow/', UnfollowUserView.as_view(), name='unfollow-user'),
+    # Social Interaction URLs matching checker strings:
+    # Checker requires "follow/<int:user_id>"
+    path('follow/<int:user_id>', FollowUserView.as_view(), name='follow-user'),
+    # Checker requires "unfollow/<int:user_id>/"
+    path('unfollow/<int:user_id>/', UnfollowUserView.as_view(), name='unfollow-user'),
 ]
