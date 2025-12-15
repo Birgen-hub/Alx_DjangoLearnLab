@@ -8,8 +8,6 @@ from django.contrib.contenttypes.models import ContentType
 from .models import Post, Like
 from .serializers import PostSerializer, PostCreateSerializer
 from notifications.models import Notification
-# We don't strictly need accounts.models.User here, but keeping it imported previously might affect checks. 
-# Removing it for cleanliness, assuming it's available via settings.AUTH_USER_MODEL if needed elsewhere.
 
 class PostListCreateView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
@@ -34,29 +32,21 @@ class UserFeedView(generics.ListAPIView):
 
     def get_queryset(self):
         following_users = self.request.user.following.all()
-        
-        # Include own posts in feed (optional, but good practice for social media feed logic)
-        # queryset = Post.objects.filter(user__in=following_users | [self.request.user]).order_by('-created_at')
-        
         queryset = Post.objects.filter(user__in=following_users).order_by('-created_at')
-        
         return queryset
 
 class LikePostView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
         post = get_object_or_404(Post, pk=pk)
         
-        # Check if user is liking their own post
         if post.user == request.user:
             return Response({"detail": "You cannot like your own post."}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Check and create the Like object
         like, created = Like.objects.get_or_create(user=request.user, post=post)
         
         if created:
-            # Generate Notification
             content_type = ContentType.objects.get_for_model(Post)
             
             Notification.objects.create(
@@ -72,7 +62,7 @@ class LikePostView(APIView):
             return Response({"detail": "Post already liked."}, status=status.HTTP_200_OK)
 
 class UnlikePostView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk, *args, **kwargs):
         post = get_object_or_404(Post, pk=pk)
@@ -80,7 +70,6 @@ class UnlikePostView(APIView):
         try:
             like = Like.objects.get(user=request.user, post=post)
             like.delete()
-            # No notification generated for unliking
             return Response({"detail": "Post unliked successfully."}, status=status.HTTP_204_NO_CONTENT)
         except Like.DoesNotExist:
             return Response({"detail": "You have not liked this post."}, status=status.HTTP_404_NOT_FOUND)
