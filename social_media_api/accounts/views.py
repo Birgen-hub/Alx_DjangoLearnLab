@@ -1,47 +1,36 @@
-cat > social_media_api/accounts/views.py << 'EOF'
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from django.views import View
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login
 
-from .models import User as CustomUser
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+def register_view(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "POST request required."}, status=400)
 
-class RegisterView(generics.GenericAPIView):
-    serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
+    username = request.POST.get("username")
+    password = request.POST.get("password")
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "token": token.key
-        }, status=status.HTTP_201_CREATED)
+    if not username or not password:
+        return JsonResponse({"error": "Username and password required."}, status=400)
 
-class LoginView(APIView):
-    permission_classes = [permissions.AllowAny]
+    if User.objects.filter(username=username).exists():
+        return JsonResponse({"error": "Username already taken."}, status=400)
 
-    def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data
-        token, created = Token.objects.get_or_create(user=user)
-        return Response({
-            "user": UserSerializer(user, context={'request': request}).data,
-            "token": token.key
-        }, status=status.HTTP_200_OK)
+    User.objects.create_user(username=username, password=password)
+    return JsonResponse({"message": "User registered successfully."})
 
-class UserListView(generics.ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
-class UserProfileView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    def get_object(self): return self.request.user
-EOF
+class LoginView(View):
+    def post(self, request):
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        if not username or not password:
+            return JsonResponse({"error": "Username and password required."}, status=400)
+
+        user = authenticate(username=username, password=password)
+        if user is None:
+            return JsonResponse({"error": "Invalid credentials."}, status=401)
+
+        login(request, user)
+        return JsonResponse({"message": "User logged in successfully."})
