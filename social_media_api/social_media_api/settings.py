@@ -7,12 +7,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 # --- PRODUCTION OVERRIDES ---
-# Sets DEBUG=False by default, unless DJANGO_DEBUG is explicitly set to 'True' in the environment.
+# Sets DEBUG=False by default in production, reading from DJANGO_DEBUG environment variable.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default-insecure-key')
 
 # Security settings
 if not DEBUG:
+    # Set ALLOWED_HOSTS from environment variable in production
     ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -24,6 +25,7 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SECURE_CONTENT_TYPE_NOSNIFF = True
 else:
+    # Development defaults
     ALLOWED_HOSTS = []
     
 INSTALLED_APPS = ['django.contrib.admin','django.contrib.auth','django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages','django.contrib.staticfiles','whitenoise.runserver_nostatic','rest_framework','rest_framework.authtoken','accounts','posts','notifications',]
