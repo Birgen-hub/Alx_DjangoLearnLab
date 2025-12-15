@@ -7,6 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(BASE_DIR))
 
 # --- PRODUCTION OVERRIDES ---
+# Sets DEBUG=False by default, unless DJANGO_DEBUG is explicitly set to 'True' in the environment.
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'default-insecure-key')
 
